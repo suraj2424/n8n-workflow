@@ -66,15 +66,30 @@ app.post("/daily-checkin", async (req, res) => {
 
     console.log("🔒 Student locked, triggering n8n webhook");
 
-    const n8nURL = process.env.n8nURL
+    const n8nURL = process.env.n8n_URL;
 
-    const n8nWebhook = `${n8nURL}/webhook/student-failed`;
+    if (!n8nURL) {
+      console.error("⚠️  n8n_URL not configured in .env file");
+    } else {
+      const n8nWebhook = `${n8nURL}/webhook/student-failed`;
+      console.log("📤 Calling n8n webhook:", n8nWebhook);
 
-    await fetch(n8nWebhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ student_id, quiz_score, focus_minutes })
-    });
+      try {
+        const webhookResponse = await fetch(n8nWebhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id, quiz_score, focus_minutes })
+        });
+
+        if (webhookResponse.ok) {
+          console.log("✅ n8n webhook triggered successfully");
+        } else {
+          console.error("❌ n8n webhook failed:", webhookResponse.status, await webhookResponse.text());
+        }
+      } catch (webhookError) {
+        console.error("❌ Error calling n8n webhook:", webhookError);
+      }
+    }
 
     res.json({ status: "Pending Mentor Review" });
   } catch (error) {
@@ -216,8 +231,16 @@ app.get("/students", async (req, res) => {
 async function startServer() {
   await runMigrations();
   
+  // Verify environment variables
+  console.log("\n🔧 Environment Configuration:");
+  console.log("   PORT:", process.env.PORT);
+  console.log("   SUPABASE_URL:", process.env.SUPABASE_URL ? "✅ Set" : "❌ Missing");
+  console.log("   SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "✅ Set" : "❌ Missing");
+  console.log("   n8n_URL:", process.env.n8n_URL || "❌ Missing");
+  console.log("");
+  
   app.listen(process.env.PORT, () => {
-    console.log("Backend running on port", process.env.PORT);
+    console.log("🚀 Backend running on port", process.env.PORT);
   });
 }
 
