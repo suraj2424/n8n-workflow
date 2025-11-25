@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { supabase } = require("./supabase.js");
+const { runMigrations } = require("./models/migrate.js");
 
 dotenv.config();
 
@@ -76,6 +77,13 @@ app.get("/status/:id", async (req, res) => {
 });
 
 
-app.listen(process.env.PORT, () => {
-  console.log("Backend running on port", process.env.PORT);
-});
+// Initialize database and start server
+async function startServer() {
+  await runMigrations();
+  
+  app.listen(process.env.PORT, () => {
+    console.log("Backend running on port", process.env.PORT);
+  });
+}
+
+startServer();
