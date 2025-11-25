@@ -194,12 +194,12 @@ npx eas build --platform ios
 
 ### Three States:
 
-1. **Normal State** (🟢)
+1. **Normal State**
    - Submit daily quiz score (0-10)
    - Log focus minutes
    - If score > 7 AND focus > 60: Stay on track
 
-2. **Locked State** (🔒)
+2. **Locked State**
    - Triggered when performance drops
    - All features disabled
    - Polls server every 5 seconds
@@ -282,6 +282,6 @@ See `n8n_Workflow/` folder for workflow JSON.
 
 ---
 
-# License
+### Fail-Safe Mechanism: The "Auto-Pilot" Protocol
 
-MIT
+If a Mentor doesn’t respond within 12 hours, I would implement a simple time-based fail-safe in the workflow. After the initial request, the system waits and sends a reminder to the Mentor. If there is still no response, it escalates the notification to a Head Mentor or a central channel. Finally, at the 12-hour mark, the system auto-resolves the case by assigning a default remedial task and unlocking the student’s progress. This avoids blocking the student indefinitely while still maintaining the required learning rigor.
