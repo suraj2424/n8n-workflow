@@ -60,7 +60,9 @@ app.post("/daily-checkin", async (req, res) => {
 
     console.log("🔒 Student locked, triggering n8n webhook");
 
-    const n8nWebhook = "https://suraj2424.app.n8n.cloud/webhook/student-failed";
+    const n8nURL = process.env.n8nURL
+
+    const n8nWebhook = `${n8nURL}/webhook/student-failed`;
 
     await fetch(n8nWebhook, {
       method: "POST",
@@ -107,6 +109,29 @@ app.post("/assign-intervention", async (req, res) => {
 
     console.log("✅ Student unlocked for remedial task");
     res.json({ message: "Intervention Assigned" });
+  } catch (error) {
+    console.error("❌ Server error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/mark-complete", async (req, res) => {
+  try {
+    const { student_id } = req.body;
+
+    console.log("✅ Marking task complete for:", student_id);
+
+    const { error } = await supabase
+      .from("students")
+      .update({ status: "normal" })
+      .eq("id", student_id);
+
+    if (error) {
+      console.error("❌ Error updating student status:", error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ status: "normal" });
   } catch (error) {
     console.error("❌ Server error:", error);
     res.status(500).json({ error: "Internal server error" });
