@@ -1,0 +1,133 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "student-failed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        -592
+      ],
+      "id": "2a5d3e26-abfd-4146-97f5-770f0e55d213",
+      "name": "Webhook",
+      "webhookId": "57545aca-bea2-453f-8259-501474d1d1a9"
+    },
+    {
+      "parameters": {
+        "sendTo": "surajsuryawanshi2424@gmail.com",
+        "subject": "=Student Need Intervention ID: {{ $json.body.student_id }}, quiz Score: {{ $json.body.quiz_score }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;\">\n  <h3 style=\"color: #d9534f; margin-top: 0;\">Student Failed</h3>\n  <p style=\"font-size: 14px; color: #333; margin-bottom: 16px;\">\n    Please select a remedial task to assign:\n  </p>\n\n  <a href=\"{{ $execution.resumeUrl }}?task=Read+Chapter+4\"\n     style=\"display: inline-block; padding: 10px 14px; background: #0275d8; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px; margin-bottom: 12px;\">\n     Assign \"Read Chapter 4\"\n  </a>\n  <br>\n\n  <a href=\"{{ $execution.resumeUrl }}?task=Review+Basic+Algebra\"\n     style=\"display: inline-block; padding: 10px 14px; background: #5cb85c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px; margin-bottom: 12px;\">\n     Assign \"Review Basic Algebra\"\n  </a>\n  <br>\n\n  <a href=\"{{ $execution.resumeUrl }}?task=Watch+Module+10\"\n     style=\"display: inline-block; padding: 10px 14px; background: #f0ad4e; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px;\">\n     Assign \"Watch Module 10\"\n  </a>\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        -592
+      ],
+      "id": "778d741b-0537-44a9-a3fe-63e972d62adc",
+      "name": "Send a message",
+      "webhookId": "fee41cfb-8983-4e09-bc06-e9f2d4f9f351",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hteIyVtTVRxONK40",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        -592
+      ],
+      "id": "d3ba16d3-206e-488f-9c8c-a7213024c12c",
+      "name": "Wait",
+      "webhookId": "fa7be019-6e9d-4508-a685-85bf5e0a6866"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-workflow-lz8f.onrender.com/assign-intervention",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"student_id\": \"{{ $('Webhook').item.json.body.student_id }}\",\n  \"task\": \"Read Chapter 4\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        -592
+      ],
+      "id": "fa5a77e8-f021-4641-8993-4e97a68bca20",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9fa6f33c-197a-47b3-974a-8a44ac29395e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d33864391fdd43339644e8eedf8560d675eefecc1760d08e081b268795ff1e12"
+  },
+  "id": "MPX8ksVBQKvlmiog",
+  "tags": []
+}
