@@ -7,7 +7,13 @@ const { runMigrations } = require("./models/migrate.js");
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: "*",   // or specific vercel domain
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type, Authorization"
+}));
+
 app.use(express.json());
 
 app.post("/daily-checkin", async (req, res) => {
