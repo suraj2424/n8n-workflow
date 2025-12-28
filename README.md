@@ -1,4 +1,4 @@
-# Alcovia - Intervention Engine
+# Intervention Engine
 
 A full-stack system that detects when students are falling behind and automatically triggers a mentorship intervention loop.
 
